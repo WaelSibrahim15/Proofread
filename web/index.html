@@ -1,0 +1,3110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TransCraft Editor</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 40 40' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='lg' x1='0' y1='0' x2='40' y2='40'%3E%3Cstop offset='0%25' stop-color='%231a3a6b'/%3E%3Cstop offset='100%25' stop-color='%232a5298'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='10' fill='url(%23lg)'/%3E%3Cline x1='7' y1='11' x2='22' y2='11' stroke='%23e8620a' stroke-width='3' stroke-linecap='round'/%3E%3Cline x1='14.5' y1='11' x2='14.5' y2='30' stroke='%23e8620a' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M34,13 A10,10 0 0,0 34,28' stroke='%23ffffff' stroke-width='3' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='33' cy='33' r='2.5' fill='%23e8620a' opacity='.85'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --bg: #f5f5f7;
+      --surface: #ffffff;
+      --surface2: #ebebf0;
+      --border: #d0d0de;
+      --text: #1a1a2e;
+      --text-dim: #9090a8;
+      --text-muted: #606080;
+      --accent: #4a7fd4;
+      --green: #1a7a1a;
+      --red: #cc1a30;
+      --yellow: #b07800;
+      --error-color: #cc1a30;
+      --warning-color: #b07800;
+      --hint-color: #4a7fd4;
+      --header-bg: #eeeef5;
+      --popover-bg: #ffffff;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      --ai-accent: #1a3a6b;
+      --ai-surface: rgba(124, 77, 204, 0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    .hidden { display: none !important; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       HEADER
+    ═══════════════════════════════════════════════════════════════════ */
+    header {
+      background: #eeeef5;
+      border-bottom: 1px solid #d0d0de;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      height: 36px;
+      flex-shrink: 0;
+      gap: 10px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tc-back {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      color: #606080;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .tc-back:hover { background: #d8d8e8; color: #1a1a2e; }
+
+    .app-logo-link {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      text-decoration: none;
+    }
+
+    .app-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+    .app-icon svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .app-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+    .app-title .trans { color: #1a3a6b; }
+    .app-title .craft { color: #e8620a; }
+    .app-title .suffix { color: #9090a8; font-weight: 400; margin-left: 3px; }
+
+    .header-center {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .lang-select-wrap { position: relative; }
+
+    select#langSelect {
+      appearance: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 13px;
+      font-family: var(--font);
+      padding: 3px 28px 3px 10px;
+      cursor: pointer;
+      outline: none;
+      min-width: 160px;
+      transition: border-color 0.15s;
+    }
+
+    select#langSelect:hover { border-color: var(--accent); }
+    select#langSelect:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(137,180,250,0.15); }
+
+    .lang-select-wrap::after {
+      content: '▾';
+      position: absolute;
+      right: 9px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--text-muted);
+      font-size: 11px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, color 0.15s;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .icon-btn:hover { background: var(--surface2); color: var(--text); }
+
+    #aiKeyBtn { font-size: 14px; font-weight: 700; transition: background 0.2s; }
+    #aiKeyBtn .ai-key-icon { transition: color 0.2s; }
+    #aiKeyBtn .ai-key-icon.active { color: #ffffff; }
+    #aiKeyBtn.key-saved {
+      background: #2a8a2a;
+      border-radius: 8px;
+      color: #ffffff;
+    }
+    #aiKeyBtn.key-saved:hover { background: #226622; }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: #1a3d1a;
+      color: #fff;
+      font-size: 13px;
+      font-family: var(--font);
+      padding: 9px 18px;
+      border-radius: 20px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 9999;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .toast.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* API status chip */
+    .api-status {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: var(--text-muted);
+      padding: 3px 8px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      white-space: nowrap;
+      user-select: none;
+    }
+    .api-status.hidden { display: none; }
+    .api-status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text-dim);
+      flex-shrink: 0;
+      transition: background 0.3s;
+    }
+    .api-status.checking .api-status-dot {
+      background: var(--accent);
+      animation: pulse 1s ease-in-out infinite;
+    }
+    .api-status.ok .api-status-dot { background: #2a8a2a; }
+    .api-status.error .api-status-dot { background: var(--error-color); }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       MAIN LAYOUT
+    ═══════════════════════════════════════════════════════════════════ */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 0;
+      overflow: hidden;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       EDITOR PANE
+    ═══════════════════════════════════════════════════════════════════ */
+    .editor-pane {
+      display: flex;
+      flex-direction: column;
+      padding: 14px 12px 0 12px;
+      gap: 0;
+      overflow: hidden;
+      border-right: 1px solid var(--border);
+    }
+
+    .editor-scroll {
+      flex: 1;
+      overflow-y: auto;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      position: relative;
+      transition: border-color 0.2s;
+    }
+
+    .editor-scroll:focus-within {
+      border-color: rgba(74, 127, 212, 0.40);
+      box-shadow: 0 0 0 3px rgba(74, 127, 212, 0.08);
+    }
+
+    #editor {
+      min-height: 100%;
+      padding: 20px 24px;
+      font-size: 18px;
+      line-height: 1.75;
+      color: var(--text);
+      outline: none;
+      white-space: pre-wrap;
+      word-break: break-word;
+      caret-color: var(--ai-accent);
+    }
+
+    #editor:empty::before {
+      content: attr(data-placeholder);
+      color: var(--text-dim);
+      pointer-events: none;
+    }
+
+    mark.err-error {
+      background: transparent;
+      text-decoration: underline;
+      text-decoration-color: #cc1a30;
+      text-decoration-style: wavy;
+      text-decoration-thickness: 2px;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: background 0.12s;
+    }
+    mark.err-error:hover, mark.err-error.active { background: rgba(204,26,48,0.10); }
+
+    mark.err-warning {
+      background: transparent;
+      text-decoration: underline;
+      text-decoration-color: #b07800;
+      text-decoration-style: wavy;
+      text-decoration-thickness: 2px;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: background 0.12s;
+    }
+    mark.err-warning:hover, mark.err-warning.active { background: rgba(176,120,0,0.10); }
+
+    mark.err-hint {
+      background: transparent;
+      text-decoration: underline;
+      text-decoration-color: #4a7fd4;
+      text-decoration-style: wavy;
+      text-decoration-thickness: 2px;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: background 0.12s;
+    }
+    mark.err-hint:hover, mark.err-hint.active { background: rgba(74,127,212,0.10); }
+
+    /* ── AI Toolbar ── */
+    .ai-toolbar {
+      flex-shrink: 0;
+      border-top: 1px solid var(--border);
+      background: var(--header-bg);
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+      padding: 0 4px;
+    }
+
+    .ai-toolbar-setup {
+      width: 100%;
+      padding: 0 6px;
+    }
+
+    .ai-setup-btn {
+      background: transparent;
+      border: 1px dashed var(--border);
+      border-radius: 6px;
+      color: var(--text-dim);
+      font-size: 12px;
+      font-family: var(--font);
+      padding: 5px 12px;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .ai-setup-btn:hover { border-color: var(--ai-accent); color: var(--ai-accent); }
+
+    .ai-toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 3px 4px;
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .ai-action-btn {
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-family: var(--font);
+      padding: 4px 9px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.12s, color 0.12s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .ai-action-btn:hover { background: var(--surface2); color: var(--text); }
+    .ai-action-btn:disabled { opacity: 0.4; cursor: default; pointer-events: none; }
+
+    .ai-btn-star { color: var(--ai-accent); font-size: 11px; }
+    .ai-toolbar-spacer { flex: 1; }
+    .ai-sep { width: 1px; height: 14px; background: var(--border); margin: 0 3px; flex-shrink: 0; }
+
+    /* Tone dropdown */
+    .ai-dropdown-wrap { position: relative; }
+
+    .ai-dropdown-menu {
+      position: absolute;
+      bottom: calc(100% + 4px);
+      left: 0;
+      background: var(--popover-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      z-index: 300;
+      min-width: 148px;
+      padding: 4px;
+      display: none;
+    }
+
+    .ai-dropdown-menu.open { display: block; }
+
+    .ai-dropdown-menu button {
+      display: block;
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-radius: 5px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: var(--font);
+      padding: 7px 10px;
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+
+    .ai-dropdown-menu button:hover { background: var(--surface2); }
+
+    /* ── Status bar ── */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 4px;
+      min-height: 42px;
+      flex-shrink: 0;
+    }
+
+    .counters { display: flex; align-items: center; gap: 14px; }
+
+    .counter-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .counter-lbl { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.6; }
+
+    .status-right { display: flex; align-items: center; gap: 8px; }
+
+    .spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+      display: none;
+      flex-shrink: 0;
+    }
+    .spinner.visible { display: block; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .status-ok { color: var(--green); font-size: 15px; display: none; }
+    .status-ok.visible { display: block; }
+
+    .error-count {
+      background: var(--error-color);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 20px;
+      padding: 2px 8px;
+      min-width: 22px;
+      text-align: center;
+      display: none;
+    }
+    .error-count.visible { display: block; }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       RIGHT PANEL (tabbed)
+    ═══════════════════════════════════════════════════════════════════ */
+    .right-pane {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    /* ── Unified panel layout ── */
+
+    .ai-workspace {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex: 0 0 55%;
+      border-top: 2px solid var(--border);
+    }
+
+    .ai-workspace-divider {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5px 12px;
+      background: var(--header-bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .ai-workspace-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ai-accent);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .ai-workspace-collapse {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-size: 12px;
+      cursor: pointer;
+      padding: 2px 5px;
+      border-radius: 4px;
+      line-height: 1;
+      transition: background 0.12s, color 0.12s;
+    }
+    .ai-workspace-collapse:hover { background: var(--surface2); color: var(--text); }
+
+    /* ── Proofread prompt (right panel) ── */
+    .proofread-prompt {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 80px;
+      padding: 20px;
+    }
+    .proofread-prompt-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .proofread-issue-count {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .proofread-btn {
+      background: var(--ai-accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 32px;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: var(--font);
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      letter-spacing: 0.02em;
+    }
+    .proofread-btn:hover { opacity: 0.88; transform: scale(1.02); }
+    .proofread-btn:active { transform: scale(0.98); }
+    .proofread-hint {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .suggestions-row { display: flex; flex-wrap: wrap; gap: 5px; }
+
+    .suggestion-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      color: var(--accent);
+      font-size: 12px;
+      font-family: var(--font);
+      padding: 3px 9px;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s;
+    }
+
+    .suggestion-btn:hover { background: rgba(74,127,212,0.10); border-color: var(--accent); }
+
+
+    /* ═══════════════════════════════════════════════════════════════════
+       AI PANEL
+    ═══════════════════════════════════════════════════════════════════ */
+    .ai-panel-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      gap: 10px;
+      color: var(--text-dim);
+      padding: 28px;
+      text-align: center;
+    }
+
+    .ai-empty-icon { font-size: 32px; opacity: 0.25; color: var(--ai-accent); }
+
+    /* Result / explain / chat views */
+    .ai-result-view,
+    .ai-explain-view,
+    .ai-chat-view {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .ai-result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 15px 9px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      gap: 8px;
+    }
+
+    .ai-result-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ai-accent);
+      flex-shrink: 0;
+    }
+
+    .ai-result-btns { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+    .ai-result-scroll { flex: 1; overflow-y: auto; padding: 14px 15px; min-height: 0; }
+
+    .ai-result-text {
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .ai-result-text.streaming::after {
+      content: '▋';
+      animation: blink 0.75s step-end infinite;
+      color: var(--ai-accent);
+      font-size: 0.85em;
+      margin-left: 1px;
+    }
+
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    /* Mini buttons */
+    .ai-mini-btn {
+      background: var(--ai-accent);
+      border: none;
+      border-radius: 5px;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: var(--font);
+      padding: 4px 10px;
+      cursor: pointer;
+      transition: opacity 0.12s;
+      white-space: nowrap;
+    }
+
+    .ai-mini-btn:hover { opacity: 0.85; }
+
+    .ai-mini-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+
+    .ai-mini-ghost:hover { background: var(--surface2); color: var(--text); }
+
+    /* Streaming bar */
+    .ai-streaming-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 15px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .ai-streaming-bar.hidden { display: none; }
+
+    .ai-streaming-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--ai-accent);
+      animation: pulse 1s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.75); } }
+
+    .ai-stop-btn {
+      margin-left: auto;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-family: var(--font);
+      padding: 2px 8px;
+      cursor: pointer;
+      transition: border-color 0.12s, color 0.12s;
+    }
+
+    .ai-stop-btn:hover { border-color: var(--text-muted); color: var(--text); }
+
+    /* Explain issue chip */
+    .ai-explain-chip {
+      background: var(--surface2);
+      border-radius: 6px;
+      padding: 8px 11px;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      border-left: 3px solid var(--error-color);
+      line-height: 1.55;
+    }
+
+    .ai-explain-chip strong { color: var(--text); display: block; margin-bottom: 2px; }
+
+    /* Chat view */
+    .ai-chat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 15px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .ai-chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0;
+    }
+
+    .ai-chat-msg {
+      max-width: 92%;
+      font-size: 13px;
+      line-height: 1.6;
+      padding: 8px 11px;
+      border-radius: 10px;
+      word-break: break-word;
+    }
+
+    .ai-chat-msg.user {
+      align-self: flex-end;
+      background: var(--surface2);
+      color: var(--text);
+      border-bottom-right-radius: 3px;
+    }
+
+    .ai-chat-msg.assistant {
+      align-self: flex-start;
+      background: var(--ai-surface);
+      border: 1px solid rgba(203,166,247,0.15);
+      color: var(--text);
+      border-bottom-left-radius: 3px;
+      white-space: pre-wrap;
+    }
+
+    .ai-chat-msg.assistant.streaming::after {
+      content: '▋';
+      animation: blink 0.75s step-end infinite;
+      color: var(--ai-accent);
+      font-size: 0.8em;
+    }
+
+    .ai-chat-input-row {
+      display: flex;
+      gap: 6px;
+      padding: 8px 10px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+      align-items: flex-end;
+    }
+
+    .ai-chat-textarea {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: var(--font);
+      padding: 6px 10px;
+      resize: none;
+      outline: none;
+      line-height: 1.5;
+      max-height: 100px;
+      overflow-y: auto;
+      transition: border-color 0.15s;
+    }
+
+    .ai-chat-textarea:focus { border-color: var(--ai-accent); }
+
+    .ai-chat-send {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: var(--ai-accent);
+      border: none;
+      color: #ffffff;
+      font-size: 15px;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.12s;
+    }
+
+    .ai-chat-send:hover { opacity: 0.85; }
+    .ai-chat-send:disabled { opacity: 0.35; cursor: default; }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       INLINE POPOVER
+    ═══════════════════════════════════════════════════════════════════ */
+    #popover {
+      position: fixed;
+      z-index: 500;
+      background: var(--popover-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08);
+      padding: 11px 13px;
+      max-width: 300px;
+      min-width: 180px;
+      display: none;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    #popover.visible { display: flex; }
+
+    .popover-title { font-size: 12px; font-weight: 600; color: var(--text); }
+    .popover-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+    .popover-suggestions { display: flex; flex-wrap: wrap; gap: 5px; }
+
+    .ai-more-sugs-btn {
+      background: transparent;
+      border: none;
+      color: var(--ai-accent);
+      font-size: 11px;
+      font-family: var(--font);
+      padding: 0;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.12s;
+      text-align: left;
+    }
+
+    .ai-more-sugs-btn:hover { opacity: 1; }
+    .ai-more-sugs-btn:disabled { opacity: 0.4; cursor: default; }
+
+    .ai-more-sugs-list { display: flex; flex-wrap: wrap; gap: 5px; }
+    .ai-more-sugs-list.hidden { display: none; }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       API KEY MODAL
+    ═══════════════════════════════════════════════════════════════════ */
+    #aiKeyModal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      padding: 0;
+      width: min(420px, 90vw);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.18);
+    }
+
+    #aiKeyModal::backdrop { background: rgba(0,0,0,0.35); backdrop-filter: blur(3px); }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-title { font-size: 14px; font-weight: 600; }
+
+    .modal-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+
+    .modal-label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
+    .modal-input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 13px;
+      font-family: monospace;
+      padding: 8px 12px;
+      outline: none;
+      width: 100%;
+      transition: border-color 0.15s;
+    }
+
+    .modal-input:focus { border-color: var(--ai-accent); }
+
+    .modal-note { font-size: 11px; color: var(--text-dim); line-height: 1.6; }
+    .modal-note a { color: var(--ai-accent); text-decoration: none; }
+    .modal-note a:hover { text-decoration: underline; }
+
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 12px 20px 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       DIFF VIEW
+    ═══════════════════════════════════════════════════════════════════ */
+    .diff-del {
+      background: rgba(204, 26, 48, 0.10);
+      color: #b01020;
+      text-decoration: line-through;
+      text-decoration-color: rgba(204, 26, 48, 0.55);
+      border-radius: 2px;
+      padding: 0 1px;
+    }
+
+    .diff-ins {
+      background: rgba(30, 140, 30, 0.10);
+      color: #1a6e1a;
+      border-radius: 2px;
+      padding: 0 1px;
+    }
+
+    .diff-chunk { display: inline; }
+
+    .diff-btns {
+      display: inline-flex;
+      gap: 2px;
+      margin-left: 3px;
+      vertical-align: middle;
+    }
+
+    .diff-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      font-size: 10px;
+      padding: 1px 4px;
+      cursor: pointer;
+      line-height: 1.3;
+      transition: background 0.1s;
+      font-family: var(--font);
+    }
+
+    .diff-btn-accept { color: #1a6e1a; }
+    .diff-btn-accept:hover { background: rgba(30, 140, 30, 0.15); border-color: #1a6e1a; }
+
+    .diff-btn-reject { color: #b01020; }
+    .diff-btn-reject:hover { background: rgba(204, 26, 48, 0.10); border-color: #b01020; }
+
+    .diff-decided-accept {
+      color: #1a6e1a;
+      background: rgba(30, 140, 30, 0.08);
+      border-radius: 2px;
+      padding: 0 1px;
+    }
+    .diff-decided-reject {
+      color: var(--text-muted);
+      text-decoration: line-through;
+      text-decoration-color: rgba(100,100,100,0.4);
+    }
+
+    /* Diff header note */
+    .diff-note {
+      font-size: 11px;
+      color: var(--text-dim);
+      padding: 6px 0 10px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 10px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       PROOFREAD SPLIT VIEW
+    ═══════════════════════════════════════════════════════════════════ */
+    .proofread-split {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow: hidden;
+      min-height: 0;
+    }
+    .proofread-split-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5px 12px;
+      background: var(--header-bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      min-height: 30px;
+    }
+    .proofread-split-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ai-accent);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .proofread-split-actions { display: flex; gap: 6px; align-items: center; }
+    .proofread-version-nav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .proofread-nav-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-muted);
+      font-size: 12px;
+      padding: 1px 6px;
+      cursor: pointer;
+      line-height: 1.3;
+      transition: background 0.12s, color 0.12s, border-color 0.12s;
+    }
+    .proofread-nav-btn:hover:not(:disabled) {
+      background: var(--surface2);
+      color: var(--text);
+      border-color: var(--ai-accent);
+    }
+    .proofread-nav-btn:disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+    .proofread-original-scroll {
+      flex: 1;
+      overflow-y: auto;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      min-height: 0;
+    }
+    .proofread-original {
+      padding: 16px 20px;
+      font-size: 18px;
+      line-height: 1.75;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-break: break-word;
+      user-select: text;
+      opacity: 0.85;
+    }
+    .proofread-split-divider {
+      flex-shrink: 0;
+      border-top: 2px solid var(--ai-accent);
+    }
+    .proofread-result-scroll {
+      flex: 1;
+      overflow-y: auto;
+      background: var(--surface);
+      min-height: 0;
+    }
+    .proofread-result-text {
+      padding: 16px 20px;
+      font-size: 18px;
+      line-height: 1.75;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .proofread-result-text.streaming::after {
+      content: '▋';
+      animation: blink 0.75s step-end infinite;
+      color: var(--ai-accent);
+      font-size: 0.85em;
+      margin-left: 1px;
+    }
+    .proofread-streaming-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 15px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+    /* When split is active, hide the main editor and split takes its space */
+    .editor-pane.split-active .editor-scroll { display: none; }
+    .editor-pane.split-active .proofread-split { flex: 1; }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       SCROLLBARS
+    ═══════════════════════════════════════════════════════════════════ */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       RTL MODE
+    ═══════════════════════════════════════════════════════════════════ */
+
+    /* Placeholder aligns right in RTL */
+    body.rtl-mode #editor:empty::before {
+      display: block;
+      text-align: right;
+    }
+
+    /* Issue cards: text right-aligned */
+    body.rtl-mode .issue-short,
+    body.rtl-mode .issue-msg,
+    body.rtl-mode .issue-word {
+      text-align: right;
+    }
+
+    /* Chat bubbles: mirror sides */
+    body.rtl-mode .ai-chat-msg.user {
+      align-self: flex-start;
+      border-bottom-right-radius: 10px;
+      border-bottom-left-radius: 3px;
+    }
+    body.rtl-mode .ai-chat-msg.assistant {
+      align-self: flex-end;
+      border-bottom-left-radius: 10px;
+      border-bottom-right-radius: 3px;
+    }
+
+    /* Suggestion buttons flow RTL */
+    body.rtl-mode .suggestions-row {
+      direction: rtl;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════════════════════════ */
+    @media (max-width: 680px) {
+      main { grid-template-columns: 1fr; }
+      .right-pane { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ HEADER -->
+<header>
+  <div class="header-left">
+    <a href="landing.html" class="tc-back">← Back</a>
+    <a href="landing.html" class="app-logo-link">
+      <div class="app-icon">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="logoGradApp" x1="0" y1="0" x2="40" y2="40">
+              <stop offset="0%" stop-color="#1a3a6b"/>
+              <stop offset="100%" stop-color="#2a5298"/>
+            </linearGradient>
+          </defs>
+          <rect width="40" height="40" rx="10" fill="url(#logoGradApp)"/>
+          <line x1="7" y1="11" x2="22" y2="11" stroke="#e8620a" stroke-width="3" stroke-linecap="round"/>
+          <line x1="14.5" y1="11" x2="14.5" y2="30" stroke="#e8620a" stroke-width="3" stroke-linecap="round"/>
+          <path d="M34,13 A10,10 0 0,0 34,28" stroke="#ffffff" stroke-width="3" stroke-linecap="round" fill="none"/>
+          <circle cx="33" cy="33" r="2.2" fill="#e8620a" opacity="0.85"/>
+        </svg>
+      </div>
+      <span class="app-title"><span class="trans">Trans</span><span class="craft">Craft</span><span class="suffix">Editor</span></span>
+    </a>
+  </div>
+
+  <div class="header-center">
+    <div class="lang-select-wrap">
+      <select id="langSelect" title="Select language">
+        <option value="auto">Detect Language</option>
+        <optgroup label="English">
+          <option value="en-US">English (US)</option>
+          <option value="en-GB">English (GB)</option>
+          <option value="en-AU">English (AU)</option>
+          <option value="en-CA">English (CA)</option>
+          <option value="en-NZ">English (NZ)</option>
+          <option value="en-ZA">English (ZA)</option>
+        </optgroup>
+        <optgroup label="Other Languages">
+          <option value="ar">Arabic</option>
+          <option value="ast-ES">Asturian</option>
+          <option value="be-BY">Belarusian</option>
+          <option value="br-FR">Breton</option>
+          <option value="ca-ES">Catalan</option>
+          <option value="zh-CN">Chinese</option>
+          <option value="da-DK">Danish</option>
+          <option value="nl">Dutch</option>
+          <option value="eo">Esperanto</option>
+          <option value="fr">French</option>
+          <option value="gl-ES">Galician</option>
+          <option value="de-DE">German (DE)</option>
+          <option value="de-AT">German (AT)</option>
+          <option value="de-CH">German (CH)</option>
+          <option value="el-GR">Greek</option>
+          <option value="ga-IE">Irish</option>
+          <option value="it">Italian</option>
+          <option value="ja-JP">Japanese</option>
+          <option value="km-KH">Khmer</option>
+          <option value="nb-NO">Norwegian</option>
+          <option value="fa">Persian</option>
+          <option value="pl-PL">Polish</option>
+          <option value="pt-PT">Portuguese (PT)</option>
+          <option value="pt-BR">Portuguese (BR)</option>
+          <option value="pt-AO">Portuguese (AO)</option>
+          <option value="pt-MZ">Portuguese (MZ)</option>
+          <option value="ro-RO">Romanian</option>
+          <option value="ru-RU">Russian</option>
+          <option value="sk-SK">Slovak</option>
+          <option value="sl-SI">Slovenian</option>
+          <option value="es">Spanish</option>
+          <option value="sv">Swedish</option>
+          <option value="tl-PH">Tagalog</option>
+          <option value="ta-IN">Tamil</option>
+          <option value="uk-UA">Ukrainian</option>
+        </optgroup>
+      </select>
+    </div>
+  </div>
+
+  <div class="header-right">
+    <div class="api-status hidden" id="apiStatus" title="Claude API status">
+      <div class="api-status-dot"></div>
+      <span id="apiStatusLabel">API</span>
+    </div>
+    <button class="icon-btn" id="aiKeyBtn" title="AI Settings">
+      <span class="ai-key-icon" id="aiKeyIcon">✦</span>
+    </button>
+    <button class="icon-btn" id="clearBtn" title="Clear text">&#x2715;</button>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════ MAIN -->
+<main>
+
+  <!-- ── Editor pane ── -->
+  <div class="editor-pane">
+    <div class="editor-scroll">
+      <div
+        id="editor"
+        contenteditable="true"
+        spellcheck="false"
+        data-placeholder="Write or paste your text here to have it checked continuously…"
+      ></div>
+    </div>
+
+    <!-- Proofread split view (hidden by default) -->
+    <div class="proofread-split hidden" id="proofreadSplit">
+      <div class="proofread-split-header">
+        <div class="proofread-version-nav" id="proofreadVersionNav">
+          <button class="proofread-nav-btn" id="proofreadNavPrev" title="Previous version">←</button>
+          <span class="proofread-split-label" id="proofreadVersionLabel">Original Text</span>
+          <button class="proofread-nav-btn" id="proofreadNavNext" title="Next version">→</button>
+        </div>
+      </div>
+      <div class="proofread-original-scroll" id="proofreadOriginalScroll">
+        <div class="proofread-original" id="proofreadOriginal"></div>
+      </div>
+      <div class="proofread-split-divider">
+        <div class="proofread-split-header">
+          <span class="proofread-split-label" id="proofreadResultLabel">Text after Proofread</span>
+          <div class="proofread-split-actions" id="proofreadSplitActions">
+            <button class="ai-mini-btn ai-mini-ghost" id="splitDiscardBtn">Discard</button>
+            <button class="ai-mini-btn" id="splitAcceptBtn">Accept</button>
+            <button class="ai-mini-btn ai-mini-ghost" id="splitCloseBtn" title="Close split view">✕</button>
+          </div>
+        </div>
+      </div>
+      <div class="proofread-result-scroll" id="proofreadResultScroll">
+        <div class="proofread-result-text" id="proofreadResultText"></div>
+      </div>
+      <div class="proofread-streaming-bar hidden" id="proofreadStreamingBar">
+        <div class="ai-streaming-dot"></div>
+        <span id="proofreadStreamingLabel">Proofreading…</span>
+        <button class="ai-stop-btn" id="proofreadStopBtn">Stop</button>
+      </div>
+    </div>
+
+    <!-- AI Toolbar -->
+    <div class="ai-toolbar" id="aiToolbar">
+      <div class="ai-toolbar-setup" id="aiToolbarSetup">
+        <button class="ai-setup-btn" id="aiToolbarSetupBtn">
+          ✦ Enable AI features — click to set your Anthropic API key
+        </button>
+      </div>
+      <div class="ai-toolbar-actions hidden" id="aiToolbarActions">
+        <div class="ai-dropdown-wrap">
+          <button class="ai-action-btn" id="btnTone">Tone ▾</button>
+          <div class="ai-dropdown-menu" id="toneMenu">
+            <button data-tone="formal" data-tone-label="Formal">Formal</button>
+            <button data-tone="casual" data-tone-label="Casual">Casual</button>
+            <button data-tone="academic" data-tone-label="Academic">Academic</button>
+            <button data-tone="friendly" data-tone-label="Friendly">Friendly</button>
+            <button data-tone="professional" data-tone-label="Professional">Professional</button>
+            <button data-tone="persuasive" data-tone-label="Persuasive">Persuasive</button>
+          </div>
+        </div>
+        <button class="ai-action-btn" id="btnSummarize">Summarize</button>
+        <button class="ai-action-btn" id="btnRestructure">Restructure</button>
+        <div class="ai-toolbar-spacer"></div>
+        <button class="ai-action-btn" id="btnChat"><span class="ai-btn-star">✦</span> Chat</button>
+      </div>
+    </div>
+
+    <!-- Status bar -->
+    <div class="status-bar">
+      <div class="counters">
+        <div class="counter-item">
+          <span class="counter-lbl">W</span>
+          <span id="wordCount">0</span>
+        </div>
+        <div class="counter-item">
+          <span class="counter-lbl">C</span>
+          <span id="charCount">0</span>
+        </div>
+      </div>
+      <div class="status-right">
+        <div class="spinner" id="spinner"></div>
+        <span class="status-ok" id="statusOk">✓</span>
+        <span class="error-count" id="errorCount"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Right panel ── -->
+  <div class="right-pane">
+
+    <!-- Proofread prompt (always visible) -->
+    <div class="proofread-prompt" id="proofreadPrompt">
+      <div class="proofread-prompt-inner">
+        <div class="proofread-issue-count" id="proofreadIssueCount"></div>
+        <button class="proofread-btn" id="proofreadBtn">Proofread?</button>
+        <div class="proofread-hint">AI-powered comprehensive check</div>
+      </div>
+    </div>
+
+    <!-- AI workspace (hidden until an AI action fires) -->
+    <div class="ai-workspace hidden" id="aiWorkspace">
+
+      <!-- Drag handle / collapse bar -->
+      <div class="ai-workspace-divider">
+        <span class="ai-workspace-label">✦ AI Assistant</span>
+        <button class="ai-workspace-collapse" id="aiWorkspaceClose" title="Close AI panel">✕</button>
+      </div>
+
+      <!-- Result view (Proofread / Tone / Summarize / Restructure) -->
+      <div class="ai-result-view hidden" id="aiResultView">
+        <div class="ai-result-header">
+          <span class="ai-result-label" id="aiResultLabel">Result</span>
+          <div class="ai-result-btns" id="aiResultBtns">
+            <button class="ai-mini-btn ai-mini-ghost" id="aiDiscardBtn">Discard</button>
+            <button class="ai-mini-btn" id="aiAcceptBtn">Accept</button>
+          </div>
+        </div>
+        <div class="ai-result-scroll">
+          <div class="ai-result-text" id="aiResultText"></div>
+        </div>
+        <div class="ai-streaming-bar hidden" id="aiStreamingBar">
+          <div class="ai-streaming-dot"></div>
+          <span id="aiStreamingLabel">Generating…</span>
+          <button class="ai-stop-btn" id="aiStopBtn">Stop</button>
+        </div>
+      </div>
+
+      <!-- Explain view -->
+      <div class="ai-explain-view hidden" id="aiExplainView">
+        <div class="ai-result-header">
+          <span class="ai-result-label">Error Explained</span>
+          <button class="ai-mini-btn ai-mini-ghost" id="aiExplainBack">← Back</button>
+        </div>
+        <div class="ai-result-scroll">
+          <div class="ai-explain-chip" id="aiExplainChip"></div>
+          <div class="ai-result-text" id="aiExplainText"></div>
+        </div>
+        <div class="ai-streaming-bar hidden" id="aiExplainStreamingBar">
+          <div class="ai-streaming-dot"></div>
+          <span>Explaining…</span>
+          <button class="ai-stop-btn" id="aiExplainStopBtn">Stop</button>
+        </div>
+      </div>
+
+      <!-- Chat view -->
+      <div class="ai-chat-view hidden" id="aiChatView">
+        <div class="ai-chat-header">
+          <span class="ai-result-label">AI Chat</span>
+          <div style="display:flex;gap:6px">
+            <button class="ai-mini-btn ai-mini-ghost" id="aiChatClear" title="Clear history">Clear</button>
+            <button class="ai-mini-btn ai-mini-ghost" id="aiChatClose">Close</button>
+          </div>
+        </div>
+        <div class="ai-chat-messages" id="aiChatMessages">
+          <div class="ai-chat-msg assistant" style="opacity:0.6">
+            Hi! I'm your AI writing assistant. Ask me anything about your text — I can suggest improvements, explain grammar rules, adjust tone, or help with any writing challenge.
+          </div>
+        </div>
+        <div class="ai-chat-input-row">
+          <textarea id="aiChatInput" class="ai-chat-textarea" placeholder="Ask about your text… (Enter to send)" rows="2"></textarea>
+          <button class="ai-chat-send" id="aiChatSend" title="Send">↑</button>
+        </div>
+      </div>
+
+    </div><!-- /ai-workspace -->
+
+  </div><!-- /right-pane -->
+
+</main>
+
+<!-- ═══════════════════════════════════════════════════════ INLINE POPOVER -->
+<div id="popover">
+  <div class="popover-title" id="popoverTitle"></div>
+  <div class="popover-desc" id="popoverDesc"></div>
+  <div class="popover-suggestions" id="popoverSuggestions"></div>
+  <button class="ai-more-sugs-btn hidden" id="aiMoreSugsBtn">✦ More suggestions</button>
+  <div class="ai-more-sugs-list hidden" id="aiMoreSugsList"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ API KEY MODAL -->
+<dialog id="aiKeyModal">
+  <div class="modal-header">
+    <span class="modal-title">AI Setup</span>
+    <button class="icon-btn" id="aiModalClose" style="font-size:14px">&#x2715;</button>
+  </div>
+  <div class="modal-body">
+    <label class="modal-label" for="aiKeyInput">Anthropic API Key</label>
+    <input type="password" id="aiKeyInput" class="modal-input" placeholder="sk-ant-api03-…" autocomplete="off" spellcheck="false" />
+    <p class="modal-note">
+      Your key is stored <strong>locally in your browser</strong> (localStorage) and sent <strong>only</strong> to
+      <code style="font-size:11px;color:var(--ai-accent)">api.anthropic.com</code> directly — never to any other server.
+    </p>
+    <p class="modal-note">
+      Get a key at <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a>
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button class="ai-mini-btn ai-mini-ghost hidden" id="aiKeyClearBtn" style="margin-right:auto">Remove Key</button>
+    <button class="ai-mini-btn ai-mini-ghost" id="aiModalCancel">Cancel</button>
+    <button class="ai-mini-btn" id="aiKeySave">Save Key</button>
+  </div>
+</dialog>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════════════════════════════
+let diagnostics = [];
+let checkTimer = null;
+let activeMatchIndex = null;
+let ignoredRules = new Set(); // ruleId strings to suppress
+
+// AI state
+let aiApiKey = localStorage.getItem('eloquent_ai_key') || '';
+let aiIsStreaming = false;
+let aiStreamController = null;
+let aiChatHistory = [];
+let aiPendingAction = null;
+let aiApiStatus = 'none'; // 'none' | 'idle' | 'checking' | 'ok' | 'error'
+let proofreadSplitActive = false;
+let proofreadOriginalSnapshot = '';
+// Version history: persists across split open/close, cleared on page refresh or Clear
+let proofreadVersions = []; // [{label:'Original', text:'...'}, {label:'Proofread 1', text:'...'}, ...]
+let proofreadVersionIdx = 0;
+let proofreadCount = 0; // running counter for "Proofread N" labels
+
+const LT_API = 'https://api.languagetool.org/v2/check';
+const CLAUDE_MODEL = 'claude-opus-4-5'; // Current Claude model
+
+// RTL language support
+const RTL_LANGS = new Set(['ar', 'fa', 'he', 'ur', 'yi', 'dv', 'ps', 'ku', 'ckb', 'sd']);
+function isRTL(lang) {
+  if (!lang || lang === 'auto') return false;
+  return RTL_LANGS.has(lang.split('-')[0]);
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  DOM REFS
+// ════════════════════════════════════════════════════════════════════════
+const editor         = document.getElementById('editor');
+const langSelect     = document.getElementById('langSelect');
+const wordCountEl    = document.getElementById('wordCount');
+const charCountEl    = document.getElementById('charCount');
+const spinnerEl      = document.getElementById('spinner');
+const statusOkEl     = document.getElementById('statusOk');
+const errorCountEl   = document.getElementById('errorCount');
+const popover        = document.getElementById('popover');
+const popoverTitle   = document.getElementById('popoverTitle');
+const popoverDesc    = document.getElementById('popoverDesc');
+const popoverSugs    = document.getElementById('popoverSuggestions');
+const aiMoreSugsBtn  = document.getElementById('aiMoreSugsBtn');
+const aiMoreSugsList = document.getElementById('aiMoreSugsList');
+const clearBtn       = document.getElementById('clearBtn');
+const aiKeyModal     = document.getElementById('aiKeyModal');
+const aiKeyInput     = document.getElementById('aiKeyInput');
+const aiKeyIcon      = document.getElementById('aiKeyIcon');
+const aiToolbarSetup  = document.getElementById('aiToolbarSetup');
+const aiToolbarActions = document.getElementById('aiToolbarActions');
+
+// ════════════════════════════════════════════════════════════════════════
+//  UTILITIES
+// ════════════════════════════════════════════════════════════════════════
+function getPlainText() { return editor.innerText || ''; }
+
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\n/g, '<br>');
+}
+
+function escapeAttr(str) { return (str || '').replace(/"/g, '&quot;'); }
+
+let toastTimer = null;
+function showToast(icon, message, duration = 2800) {
+  const toast = document.getElementById('toast');
+  toast.innerHTML = `<span>${icon}</span><span>${message}</span>`;
+  toast.classList.add('visible');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('visible'), duration);
+}
+
+function getSentenceContext(offset) {
+  const text = getPlainText();
+  const start = Math.max(0, offset - 80);
+  const end   = Math.min(text.length, offset + 120);
+  return (start > 0 ? '…' : '') + text.slice(start, end) + (end < text.length ? '…' : '');
+}
+
+function getSelectionOffset() {
+  const sel = window.getSelection();
+  if (!sel || sel.rangeCount === 0) return 0;
+  const range = sel.getRangeAt(0).cloneRange();
+  range.selectNodeContents(editor);
+  range.setEnd(sel.getRangeAt(0).startContainer, sel.getRangeAt(0).startOffset);
+  return range.toString().length;
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  COUNTERS & STATUS
+// ════════════════════════════════════════════════════════════════════════
+function updateCounters(text) {
+  const words = text
+    .replace(/[.,?!;()"'\-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .split(' ')
+    .filter(w => w !== '');
+  const chars = [...words.join('')].length;
+  wordCountEl.textContent = words.length;
+  charCountEl.textContent = chars;
+}
+
+function setStatus(state, count) {
+  spinnerEl.classList.remove('visible');
+  statusOkEl.classList.remove('visible');
+  errorCountEl.classList.remove('visible');
+  if (state === 'checking') {
+    spinnerEl.classList.add('visible');
+  } else if (state === 'ok') {
+    statusOkEl.classList.add('visible');
+  } else if (state === 'errors') {
+    errorCountEl.textContent = count;
+    errorCountEl.classList.add('visible');
+  }
+}
+
+function updateApiStatus(state) {
+  aiApiStatus = state;
+  const chip  = document.getElementById('apiStatus');
+  const label = document.getElementById('apiStatusLabel');
+  if (state === 'none') {
+    chip.classList.add('hidden');
+    return;
+  }
+  chip.classList.remove('hidden');
+  chip.className = `api-status${state === 'checking' ? ' checking' : state === 'ok' ? ' ok' : state === 'error' ? ' error' : ''}`;
+  const labels = { idle: 'API', checking: 'Checking…', ok: 'Connected', error: 'Error' };
+  label.textContent = labels[state] || 'API';
+  if (state === 'error') chip.title = 'Claude API returned an error';
+  else if (state === 'ok') chip.title = 'Claude API is reachable';
+  else chip.title = 'Claude API status';
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  RTL SUPPORT
+// ════════════════════════════════════════════════════════════════════════
+function applyRTL(rtl) {
+  const dir = rtl ? 'rtl' : 'ltr';
+
+  // Editor
+  editor.dir = dir;
+  editor.style.textAlign = rtl ? 'right' : '';
+
+  // AI result panels
+  document.getElementById('aiResultText').dir = dir;
+  document.getElementById('aiExplainText').dir = dir;
+
+  // Chat input
+  document.getElementById('aiChatInput').dir = dir;
+
+  // Body class for CSS hooks
+  document.body.classList.toggle('rtl-mode', rtl);
+
+  // Lazy-load Arabic web font the first time RTL is activated
+  if (rtl) {
+    if (!document.getElementById('arabic-font')) {
+      const link = document.createElement('link');
+      link.id = 'arabic-font';
+      link.rel = 'stylesheet';
+      link.href = 'https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600&display=swap';
+      document.head.appendChild(link);
+    }
+    const baseFont = getComputedStyle(document.documentElement).getPropertyValue('--font').trim();
+    editor.style.fontFamily = `'Noto Naskh Arabic', ${baseFont}`;
+    document.getElementById('aiResultText').style.fontFamily = `'Noto Naskh Arabic', ${baseFont}`;
+    document.getElementById('aiExplainText').style.fontFamily = `'Noto Naskh Arabic', ${baseFont}`;
+  } else {
+    editor.style.fontFamily = '';
+    document.getElementById('aiResultText').style.fontFamily = '';
+    document.getElementById('aiExplainText').style.fontFamily = '';
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  GRAMMAR CHECK (LanguageTool)
+// ════════════════════════════════════════════════════════════════════════
+function getMatchType(match) {
+  if (match.type?.typeName === 'Hint') return 'hint';
+  if (match.rule?.issueType === 'style') return 'hint';
+  if (match.type?.typeName === 'Other') return 'warning';
+  if (match.rule?.issueType === 'inconsistency') return 'warning';
+  return 'error';
+}
+
+async function checkGrammar(text, language) {
+  const params = new URLSearchParams({ text, language: language || 'auto', enabledOnly: 'false' });
+  const resp = await fetch(LT_API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: params.toString(),
+  });
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  return resp.json();
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  ANNOTATIONS
+// ════════════════════════════════════════════════════════════════════════
+function applyAnnotations(text, matches) {
+  if (!matches || matches.length === 0) return escapeHtml(text);
+  const sorted = [...matches].sort((a, b) => a.offset - b.offset);
+  let result = '';
+  let cursor = 0;
+  for (const match of sorted) {
+    const start = match.offset;
+    const end   = match.offset + match.length;
+    if (start < cursor) continue;
+    result += escapeHtml(text.slice(cursor, start));
+    const type    = getMatchType(match);
+    const idx     = matches.indexOf(match);
+    const snippet = escapeHtml(text.slice(start, end));
+    result += `<mark class="err-${type}" data-idx="${idx}">${snippet}</mark>`;
+    cursor = end;
+  }
+  result += escapeHtml(text.slice(cursor));
+  return result;
+}
+
+function saveSelection() {
+  const sel = window.getSelection();
+  if (!sel || sel.rangeCount === 0) return null;
+  const range = sel.getRangeAt(0);
+  const preRange = range.cloneRange();
+  preRange.selectNodeContents(editor);
+  preRange.setEnd(range.startContainer, range.startOffset);
+  const start = preRange.toString().length;
+  return { start, length: range.toString().length };
+}
+
+function restoreSelection(saved) {
+  if (!saved) return;
+  try {
+    const range = getTextOffsetRange(editor, saved.start, saved.start + saved.length);
+    if (range) {
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  } catch(e) { /* ignore */ }
+}
+
+function getTextOffsetRange(root, startOff, endOff) {
+  let charCount = 0;
+  let sNode = null, eNode = null, sOff = 0, eOff2 = 0;
+  function walk(node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const len = node.textContent.length;
+      if (!sNode && charCount + len >= startOff) { sNode = node; sOff = startOff - charCount; }
+      if (!eNode && charCount + len >= endOff)   { eNode = node; eOff2 = endOff - charCount; }
+      charCount += len;
+    } else if (node.nodeName === 'BR') {
+      charCount += 1;
+    } else {
+      for (const child of node.childNodes) { walk(child); if (sNode && eNode) break; }
+    }
+  }
+  walk(root);
+  if (!sNode) return null;
+  if (!eNode) { eNode = sNode; eOff2 = sOff; }
+  const range = document.createRange();
+  range.setStart(sNode, sOff);
+  range.setEnd(eNode, eOff2);
+  return range;
+}
+
+function renderAnnotations() {
+  if (proofreadSplitActive) return; // Don't re-render while split is hiding the editor
+  const text = getPlainText();
+  const sel  = saveSelection();
+  editor.innerHTML = applyAnnotations(text, diagnostics);
+  restoreSelection(sel);
+  attachMarkListeners();
+}
+
+function attachMarkListeners() {
+  editor.querySelectorAll('mark').forEach(mark => {
+    mark.addEventListener('click', e => {
+      e.stopPropagation();
+      highlightMatch(parseInt(mark.dataset.idx));
+    });
+  });
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  ISSUES PANEL
+// ════════════════════════════════════════════════════════════════════════
+function renderIssues(matches) {
+  const countEl = document.getElementById('proofreadIssueCount');
+  if (!countEl) return;
+  if (matches.length === 0) {
+    countEl.textContent = '';
+  } else {
+    countEl.textContent = `${matches.length} issue${matches.length !== 1 ? 's' : ''} detected`;
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  HIGHLIGHT & POPOVER
+// ════════════════════════════════════════════════════════════════════════
+function highlightMatch(idx) {
+  editor.querySelectorAll('mark.active').forEach(m => m.classList.remove('active'));
+
+  const mark = editor.querySelector(`mark[data-idx="${idx}"]`);
+  if (mark) {
+    mark.classList.add('active');
+    mark.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    showPopoverForMark(mark, idx);
+  }
+
+  activeMatchIndex = idx;
+}
+
+function showPopoverForMark(markEl, idx) {
+  const match = diagnostics[idx];
+  if (!match) return;
+
+  popoverTitle.textContent = match.shortMessage || 'Grammar Issue';
+  popoverDesc.textContent  = match.message;
+  popoverSugs.innerHTML    = '';
+  aiMoreSugsBtn.classList.add('hidden');
+  aiMoreSugsList.classList.add('hidden');
+  aiMoreSugsList.innerHTML = '';
+  aiMoreSugsBtn.textContent = '✦ More suggestions';
+  aiMoreSugsBtn.disabled = false;
+
+  (match.replacements || []).slice(0, 3).forEach(r => {
+    const btn = document.createElement('button');
+    btn.className = 'suggestion-btn';
+    btn.textContent = r.value;
+    btn.addEventListener('click', () => applyFix(idx, r.value));
+    popoverSugs.appendChild(btn);
+  });
+
+  if (aiApiKey) aiMoreSugsBtn.classList.remove('hidden');
+
+  const rect = markEl.getBoundingClientRect();
+  popover.classList.add('visible');
+  const pw = popover.offsetWidth || 240;
+  let top  = rect.bottom + 8;
+  let left = rect.left;
+  if (left + pw > window.innerWidth - 12) left = window.innerWidth - pw - 12;
+  if (top + 150 > window.innerHeight) top = rect.top - 150;
+  popover.style.top  = `${Math.max(8, top)}px`;
+  popover.style.left = `${Math.max(8, left)}px`;
+}
+
+function hidePopover() {
+  popover.classList.remove('visible');
+  editor.querySelectorAll('mark.active').forEach(m => m.classList.remove('active'));
+  activeMatchIndex = null;
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  FIX APPLICATION
+// ════════════════════════════════════════════════════════════════════════
+function applyFix(idx, value) {
+  const match = diagnostics[idx];
+  if (!match) return;
+  const text    = getPlainText();
+  const newText = text.slice(0, match.offset) + value + text.slice(match.offset + match.length);
+  editor.innerText = newText;
+  hidePopover();
+  scheduleCheck(true);
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  CHECK SCHEDULING
+// ════════════════════════════════════════════════════════════════════════
+function scheduleCheck(immediate = false) {
+  clearTimeout(checkTimer);
+  checkTimer = setTimeout(runCheck, immediate ? 60 : 850);
+}
+
+async function runCheck() {
+  const text = getPlainText();
+  if (!text.trim()) {
+    diagnostics = [];
+    renderAnnotations();
+    renderIssues([]);
+    setStatus('ok', 0);
+    updateCounters('');
+    return;
+  }
+  setStatus('checking');
+
+  try {
+    const result = await checkGrammar(text, langSelect.value);
+    // Filter out any ignored issues
+    const all = result.matches || [];
+    diagnostics = all.filter(m => {
+      const key = m.rule?.id + '::' + m.offset + '::' + m.length;
+      return !ignoredRules.has(key);
+    });
+    renderAnnotations();
+    renderIssues(diagnostics);
+    setStatus(diagnostics.length === 0 ? 'ok' : 'errors', diagnostics.length);
+  } catch(err) {
+    console.error('Grammar check error:', err);
+    setStatus('ok', 0);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  PANEL SWITCHING
+// ════════════════════════════════════════════════════════════════════════
+function showAIWorkspace() {
+  document.getElementById('aiWorkspace').classList.remove('hidden');
+}
+
+function switchAIView(view) {
+  document.getElementById('aiResultView').classList.toggle('hidden', view !== 'result');
+  document.getElementById('aiExplainView').classList.toggle('hidden', view !== 'explain');
+  document.getElementById('aiChatView').classList.toggle('hidden', view !== 'chat');
+  // When returning to empty state, collapse the AI workspace entirely
+  if (view === 'empty') {
+    document.getElementById('aiWorkspace').classList.add('hidden');
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  CLAUDE API CLIENT
+// ════════════════════════════════════════════════════════════════════════
+async function callClaude({ systemPrompt, userMessage, onChunk, signal, maxTokens }) {
+  if (!aiApiKey) throw new Error('No API key. Click ✦ in the header to set one.');
+
+  const body = {
+    model: CLAUDE_MODEL,
+    max_tokens: maxTokens || 2048,
+    stream: !!onChunk,
+    system: systemPrompt,
+    messages: [{ role: 'user', content: userMessage }],
+  };
+
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    signal,
+    headers: {
+      'x-api-key': aiApiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `API error ${resp.status}`);
+  }
+
+  if (!onChunk) {
+    const data = await resp.json();
+    return data.content[0].text;
+  }
+
+  // SSE streaming
+  const reader  = resp.body.getReader();
+  const decoder = new TextDecoder();
+  let buf = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += decoder.decode(value, { stream: true });
+    const lines = buf.split('\n');
+    buf = lines.pop();
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue;
+      const raw = line.slice(6).trim();
+      if (raw === '[DONE]') return;
+      try {
+        const evt = JSON.parse(raw);
+        if (evt.type === 'content_block_delta' && evt.delta?.type === 'text_delta') {
+          onChunk(evt.delta.text);
+        }
+      } catch { /* ignore partial JSON */ }
+    }
+  }
+}
+
+async function callClaudeChat({ systemPrompt, messages, onChunk, signal }) {
+  if (!aiApiKey) throw new Error('No API key configured.');
+
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    signal,
+    headers: {
+      'x-api-key': aiApiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: CLAUDE_MODEL,
+      max_tokens: 1024,
+      stream: true,
+      system: systemPrompt,
+      messages,
+    }),
+  });
+
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `API error ${resp.status}`);
+  }
+
+  const reader  = resp.body.getReader();
+  const decoder = new TextDecoder();
+  let buf = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += decoder.decode(value, { stream: true });
+    const lines = buf.split('\n');
+    buf = lines.pop();
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue;
+      const raw = line.slice(6).trim();
+      if (raw === '[DONE]') return;
+      try {
+        const evt = JSON.parse(raw);
+        if (evt.type === 'content_block_delta' && evt.delta?.type === 'text_delta') onChunk(evt.delta.text);
+      } catch { /* ignore */ }
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  AI ACTION RUNNER
+// ════════════════════════════════════════════════════════════════════════
+async function runAIAction(actionFn) {
+  if (aiIsStreaming) { aiStreamController?.abort(); }
+  aiStreamController = new AbortController();
+  aiIsStreaming = true;
+  setAIToolbarEnabled(false);
+  updateApiStatus('checking');
+
+  try {
+    await actionFn(aiStreamController.signal);
+    updateApiStatus('ok');
+  } catch(err) {
+    if (err.name === 'AbortError') { updateApiStatus('idle'); return; }
+    updateApiStatus('error');
+    showAIError(err.message);
+  } finally {
+    aiIsStreaming = false;
+    setAIToolbarEnabled(true);
+  }
+}
+
+function setAIToolbarEnabled(enabled) {
+  aiToolbarActions.querySelectorAll('.ai-action-btn').forEach(btn => { btn.disabled = !enabled; });
+}
+
+function showAIError(msg) {
+  if (proofreadSplitActive) {
+    // Show error in split view
+    document.getElementById('proofreadStreamingBar').classList.add('hidden');
+    const resultTextEl = document.getElementById('proofreadResultText');
+    resultTextEl.classList.remove('streaming');
+    resultTextEl.textContent = 'Error: ' + msg;
+    // Re-enable Proofread button
+    const proofreadBtn = document.getElementById('proofreadBtn');
+    proofreadBtn.disabled = false;
+    proofreadBtn.textContent = 'Proofread?';
+    return;
+  }
+  document.getElementById('aiResultLabel').textContent = 'Error';
+  document.getElementById('aiResultText').textContent = msg;
+  document.getElementById('aiResultText').classList.remove('streaming');
+  document.getElementById('aiResultBtns').innerHTML = '<button class="ai-mini-btn ai-mini-ghost" id="aiDiscardBtn2">Close</button>';
+  document.getElementById('aiDiscardBtn2')?.addEventListener('click', () => switchAIView('empty'));
+  document.getElementById('aiStreamingBar').classList.add('hidden');
+  showAIWorkspace();
+  switchAIView('result');
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  AI FEATURES
+// ════════════════════════════════════════════════════════════════════════
+
+// ════════════════════════════════════════════════════════════════════════
+//  DIFF ENGINE
+// ════════════════════════════════════════════════════════════════════════
+
+// Word-level LCS diff → returns array of {type:'eq'|'ins'|'del', text}
+function diffWords(original, revised) {
+  const tokA = original.match(/\S+|\s+/g) || [];
+  const tokB = revised.match(/\S+|\s+/g) || [];
+  const m = tokA.length, n = tokB.length;
+  // LCS DP table
+  const dp = Array.from({ length: m + 1 }, () => new Uint32Array(n + 1));
+  for (let i = m - 1; i >= 0; i--) {
+    for (let j = n - 1; j >= 0; j--) {
+      dp[i][j] = tokA[i] === tokB[j]
+        ? dp[i + 1][j + 1] + 1
+        : Math.max(dp[i + 1][j], dp[i][j + 1]);
+    }
+  }
+  // Traceback
+  const ops = [];
+  let i = 0, j = 0;
+  while (i < m || j < n) {
+    if (i < m && j < n && tokA[i] === tokB[j]) {
+      ops.push({ type: 'eq', text: tokA[i] }); i++; j++;
+    } else if (j < n && (i >= m || dp[i][j + 1] >= dp[i + 1][j])) {
+      ops.push({ type: 'ins', text: tokB[j] }); j++;
+    } else {
+      ops.push({ type: 'del', text: tokA[i] }); i++;
+    }
+  }
+  return ops;
+}
+
+function renderDiff(original, revised) {
+  const container = document.getElementById('aiResultText');
+  container.innerHTML = '';
+  container.classList.remove('streaming');
+
+  if (!aiPendingAction) return;
+
+  const ops = diffWords(original, revised);
+
+  // Group into eq / change chunks
+  const chunks = [];
+  let chunkIdx = 0;
+  let k = 0;
+  while (k < ops.length) {
+    if (ops[k].type === 'eq') {
+      chunks.push({ type: 'eq', text: ops[k].text });
+      k++;
+    } else {
+      let delText = '', insText = '';
+      while (k < ops.length && ops[k].type === 'del') { delText += ops[k].text; k++; }
+      while (k < ops.length && ops[k].type === 'ins') { insText += ops[k].text; k++; }
+      if (delText || insText) chunks.push({ type: 'change', del: delText, ins: insText, idx: chunkIdx++ });
+    }
+  }
+
+  aiPendingAction.diffChunks = chunks;
+  aiPendingAction.chunkDecisions = {};
+
+  const changeCount = chunks.filter(c => c.type === 'change').length;
+  if (changeCount === 0) {
+    // No changes — just show the text
+    container.textContent = revised;
+    return;
+  }
+
+  // Diff note
+  const note = document.createElement('div');
+  note.className = 'diff-note';
+  note.textContent = `${changeCount} change${changeCount !== 1 ? 's' : ''} — click ✓ or ✗ to decide individually, or use Accept/Discard above.`;
+  container.appendChild(note);
+
+  chunks.forEach(chunk => {
+    if (chunk.type === 'eq') {
+      container.appendChild(document.createTextNode(chunk.text));
+    } else {
+      const wrap = document.createElement('span');
+      wrap.className = 'diff-chunk';
+      wrap.dataset.idx = chunk.idx;
+
+      if (chunk.del) {
+        const del = document.createElement('del');
+        del.className = 'diff-del';
+        del.textContent = chunk.del;
+        wrap.appendChild(del);
+      }
+      if (chunk.ins) {
+        const ins = document.createElement('ins');
+        ins.className = 'diff-ins';
+        ins.textContent = chunk.ins;
+        wrap.appendChild(ins);
+      }
+
+      // Per-chunk buttons
+      const btnWrap = document.createElement('span');
+      btnWrap.className = 'diff-btns';
+
+      const acceptBtn = document.createElement('button');
+      acceptBtn.className = 'diff-btn diff-btn-accept';
+      acceptBtn.title = 'Accept this change';
+      acceptBtn.textContent = '✓';
+
+      const rejectBtn = document.createElement('button');
+      rejectBtn.className = 'diff-btn diff-btn-reject';
+      rejectBtn.title = 'Reject this change (keep original)';
+      rejectBtn.textContent = '✗';
+
+      acceptBtn.addEventListener('click', () => applyChunkDecision(chunk.idx, 'accept', wrap, chunk));
+      rejectBtn.addEventListener('click', () => applyChunkDecision(chunk.idx, 'reject', wrap, chunk));
+
+      btnWrap.appendChild(acceptBtn);
+      btnWrap.appendChild(rejectBtn);
+      wrap.appendChild(btnWrap);
+      container.appendChild(wrap);
+    }
+  });
+}
+
+function applyChunkDecision(idx, decision, wrapEl, chunk) {
+  if (!aiPendingAction) return;
+  aiPendingAction.chunkDecisions[idx] = decision;
+
+  const replacement = decision === 'accept' ? (chunk.ins || '') : (chunk.del || '');
+  const span = document.createElement('span');
+  span.className = `diff-decided diff-decided-${decision}`;
+  span.textContent = replacement;
+  wrapEl.replaceWith(span);
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  PROOFREAD SPLIT VIEW
+// ════════════════════════════════════════════════════════════════════════
+
+// ── Version history helpers ──
+function updateVersionNav() {
+  const label = document.getElementById('proofreadVersionLabel');
+  const prevBtn = document.getElementById('proofreadNavPrev');
+  const nextBtn = document.getElementById('proofreadNavNext');
+  if (!label || proofreadVersions.length === 0) return;
+
+  const v = proofreadVersions[proofreadVersionIdx];
+  label.textContent = v.label;
+  prevBtn.disabled = (proofreadVersionIdx <= 0);
+  nextBtn.disabled = (proofreadVersionIdx >= proofreadVersions.length - 1);
+}
+
+function showVersionText(idx) {
+  proofreadVersionIdx = idx;
+  const v = proofreadVersions[idx];
+  const originalEl = document.getElementById('proofreadOriginal');
+  originalEl.textContent = v.text;
+  // Copy RTL direction
+  const dir = editor.dir || 'ltr';
+  originalEl.dir = dir;
+  if (editor.style.fontFamily) originalEl.style.fontFamily = editor.style.fontFamily;
+  updateVersionNav();
+}
+
+function navProofreadPrev() {
+  if (proofreadVersionIdx > 0) showVersionText(proofreadVersionIdx - 1);
+}
+
+function navProofreadNext() {
+  if (proofreadVersionIdx < proofreadVersions.length - 1) showVersionText(proofreadVersionIdx + 1);
+}
+
+// ── Core split view functions ──
+function openProofreadSplit(originalHtml, originalPlainText) {
+  proofreadSplitActive = true;
+  proofreadOriginalSnapshot = originalPlainText;
+
+  // If no versions yet, save the original as version 0
+  if (proofreadVersions.length === 0) {
+    proofreadVersions.push({ label: 'Original', text: originalPlainText });
+    proofreadVersionIdx = 0;
+  } else {
+    // Show the latest version (the current editor text) in the upper box
+    proofreadVersionIdx = proofreadVersions.length - 1;
+  }
+
+  const editorPane = document.querySelector('.editor-pane');
+  const splitEl = document.getElementById('proofreadSplit');
+  const originalEl = document.getElementById('proofreadOriginal');
+  const resultTextEl = document.getElementById('proofreadResultText');
+
+  // Populate upper box with current version text (plain text for version nav)
+  // For the very first proofread, show with marks; for later ones, show plain text
+  if (proofreadVersions.length === 1 && proofreadVersionIdx === 0) {
+    originalEl.innerHTML = originalHtml;
+  } else {
+    originalEl.textContent = proofreadVersions[proofreadVersionIdx].text;
+  }
+
+  // Update version nav
+  updateVersionNav();
+
+  // Clear lower box and start streaming appearance
+  resultTextEl.textContent = '';
+  resultTextEl.classList.add('streaming');
+
+  // Update lower box label with upcoming proofread number
+  const upcomingNum = proofreadCount + 1;
+  document.getElementById('proofreadResultLabel').textContent = 'Text after Proofread ' + upcomingNum;
+
+  // Show streaming bar
+  document.getElementById('proofreadStreamingBar').classList.remove('hidden');
+  document.getElementById('proofreadStreamingLabel').textContent = 'Proofreading…';
+
+  // Show split, hide editor
+  splitEl.classList.remove('hidden');
+  editorPane.classList.add('split-active');
+
+  // Reset actions: show Accept/Discard/Close
+  const actionsEl = document.getElementById('proofreadSplitActions');
+  actionsEl.innerHTML = `
+    <button class="ai-mini-btn ai-mini-ghost" id="splitDiscardBtn">Discard</button>
+    <button class="ai-mini-btn" id="splitAcceptBtn">Accept</button>
+    <button class="ai-mini-btn ai-mini-ghost" id="splitCloseBtn" title="Close split view">✕</button>
+  `;
+  document.getElementById('splitDiscardBtn').addEventListener('click', discardProofreadSplit);
+  document.getElementById('splitAcceptBtn').addEventListener('click', acceptProofreadSplit);
+  document.getElementById('splitCloseBtn').addEventListener('click', closeProofreadSplit);
+
+  // Wire version nav buttons (use onclick to avoid stacking listeners on repeated opens)
+  document.getElementById('proofreadNavPrev').onclick = navProofreadPrev;
+  document.getElementById('proofreadNavNext').onclick = navProofreadNext;
+
+  // Copy RTL direction from editor
+  const dir = editor.dir || 'ltr';
+  originalEl.dir = dir;
+  resultTextEl.dir = dir;
+  if (editor.style.fontFamily) {
+    originalEl.style.fontFamily = editor.style.fontFamily;
+    resultTextEl.style.fontFamily = editor.style.fontFamily;
+  }
+
+  // Disable Proofread button while streaming
+  const proofreadBtn = document.getElementById('proofreadBtn');
+  proofreadBtn.disabled = true;
+  proofreadBtn.textContent = 'Proofreading…';
+}
+
+function closeProofreadSplit() {
+  proofreadSplitActive = false;
+  proofreadOriginalSnapshot = '';
+  aiPendingAction = null;
+  // NOTE: proofreadVersions is NOT cleared — persists across split open/close
+
+  const editorPane = document.querySelector('.editor-pane');
+  const splitEl = document.getElementById('proofreadSplit');
+
+  splitEl.classList.add('hidden');
+  editorPane.classList.remove('split-active');
+
+  // Re-enable Proofread button
+  const proofreadBtn = document.getElementById('proofreadBtn');
+  proofreadBtn.disabled = false;
+  proofreadBtn.textContent = 'Proofread?';
+
+  // Re-render annotations in the editor (they may have changed if accepted)
+  renderAnnotations();
+}
+
+function acceptProofreadSplit() {
+  if (!aiPendingAction?.result) return;
+  const { isSelection, selectionStart, selectionLength, result } = aiPendingAction;
+
+  // Build final text from chunk decisions (same logic as acceptAIResult)
+  let finalText = result;
+  const chunks = aiPendingAction.diffChunks;
+  if (chunks && chunks.length > 0) {
+    finalText = chunks.map(chunk => {
+      if (chunk.type === 'eq') return chunk.text;
+      const decision = aiPendingAction.chunkDecisions?.[chunk.idx];
+      if (decision === 'reject') return chunk.del || '';
+      // 'accept' or undecided → use AI's version
+      return chunk.ins || '';
+    }).join('');
+  }
+
+  // Apply to editor
+  if (isSelection) {
+    const text = getPlainText();
+    const newText = text.slice(0, selectionStart) + finalText + text.slice(selectionStart + selectionLength);
+    editor.innerText = newText;
+  } else {
+    editor.innerText = finalText;
+  }
+
+  diagnostics = [];
+  updateCounters(getPlainText());
+  scheduleCheck(true);
+  aiPendingAction = null;
+
+  // Save the new version to history
+  proofreadCount++;
+  const newLabel = 'Proofread ' + proofreadCount;
+  proofreadVersions.push({ label: newLabel, text: getPlainText() });
+  proofreadVersionIdx = proofreadVersions.length - 1;
+
+  // Update upper box to show the new version label and text
+  const originalEl = document.getElementById('proofreadOriginal');
+  originalEl.textContent = getPlainText();
+  updateVersionNav();
+
+  // Show confirmation in lower box
+  const resultTextEl = document.getElementById('proofreadResultText');
+  resultTextEl.innerHTML = '';
+  resultTextEl.classList.remove('streaming');
+  resultTextEl.textContent = 'Changes applied. You can close this view or proofread again.';
+
+  // Replace actions with just Close button
+  const actionsEl = document.getElementById('proofreadSplitActions');
+  actionsEl.innerHTML = `
+    <button class="ai-mini-btn ai-mini-ghost" id="splitCloseBtn" title="Close split view">✕ Close</button>
+  `;
+  document.getElementById('splitCloseBtn').addEventListener('click', closeProofreadSplit);
+
+  // Re-enable Proofread button
+  const proofreadBtn = document.getElementById('proofreadBtn');
+  proofreadBtn.disabled = false;
+  proofreadBtn.textContent = 'Proofread?';
+}
+
+function discardProofreadSplit() {
+  aiPendingAction = null;
+
+  const resultTextEl = document.getElementById('proofreadResultText');
+  resultTextEl.innerHTML = '';
+  resultTextEl.classList.remove('streaming');
+  resultTextEl.textContent = 'Changes discarded. Original text preserved.';
+
+  document.getElementById('proofreadStreamingBar').classList.add('hidden');
+
+  // Replace actions with just Close button
+  const actionsEl = document.getElementById('proofreadSplitActions');
+  actionsEl.innerHTML = `
+    <button class="ai-mini-btn ai-mini-ghost" id="splitCloseBtn" title="Close split view">✕ Close</button>
+  `;
+  document.getElementById('splitCloseBtn').addEventListener('click', closeProofreadSplit);
+
+  // Re-enable Proofread button
+  const proofreadBtn = document.getElementById('proofreadBtn');
+  proofreadBtn.disabled = false;
+  proofreadBtn.textContent = 'Proofread?';
+}
+
+function renderDiffInSplit(original, revised) {
+  const container = document.getElementById('proofreadResultText');
+  container.innerHTML = '';
+  container.classList.remove('streaming');
+
+  if (!aiPendingAction) return;
+
+  const ops = diffWords(original, revised);
+
+  // Group into eq / change chunks
+  const chunks = [];
+  let chunkIdx = 0;
+  let k = 0;
+  while (k < ops.length) {
+    if (ops[k].type === 'eq') {
+      chunks.push({ type: 'eq', text: ops[k].text });
+      k++;
+    } else {
+      let delText = '', insText = '';
+      while (k < ops.length && ops[k].type === 'del') { delText += ops[k].text; k++; }
+      while (k < ops.length && ops[k].type === 'ins') { insText += ops[k].text; k++; }
+      if (delText || insText) chunks.push({ type: 'change', del: delText, ins: insText, idx: chunkIdx++ });
+    }
+  }
+
+  aiPendingAction.diffChunks = chunks;
+  aiPendingAction.chunkDecisions = {};
+
+  const changeCount = chunks.filter(c => c.type === 'change').length;
+  if (changeCount === 0) {
+    container.textContent = revised;
+    return;
+  }
+
+  // Diff note
+  const note = document.createElement('div');
+  note.className = 'diff-note';
+  note.textContent = `${changeCount} change${changeCount !== 1 ? 's' : ''} — click ✓ or ✗ to decide individually, or use Accept/Discard above.`;
+  container.appendChild(note);
+
+  chunks.forEach(chunk => {
+    if (chunk.type === 'eq') {
+      container.appendChild(document.createTextNode(chunk.text));
+    } else {
+      const wrap = document.createElement('span');
+      wrap.className = 'diff-chunk';
+      wrap.dataset.idx = chunk.idx;
+
+      if (chunk.del) {
+        const del = document.createElement('del');
+        del.className = 'diff-del';
+        del.textContent = chunk.del;
+        wrap.appendChild(del);
+      }
+      if (chunk.ins) {
+        const ins = document.createElement('ins');
+        ins.className = 'diff-ins';
+        ins.textContent = chunk.ins;
+        wrap.appendChild(ins);
+      }
+
+      const btnWrap = document.createElement('span');
+      btnWrap.className = 'diff-btns';
+      const acceptBtn = document.createElement('button');
+      acceptBtn.className = 'diff-btn diff-btn-accept';
+      acceptBtn.title = 'Accept this change';
+      acceptBtn.textContent = '✓';
+      const rejectBtn = document.createElement('button');
+      rejectBtn.className = 'diff-btn diff-btn-reject';
+      rejectBtn.title = 'Reject this change (keep original)';
+      rejectBtn.textContent = '✗';
+      acceptBtn.addEventListener('click', () => applyChunkDecision(chunk.idx, 'accept', wrap, chunk));
+      rejectBtn.addEventListener('click', () => applyChunkDecision(chunk.idx, 'reject', wrap, chunk));
+      btnWrap.appendChild(acceptBtn);
+      btnWrap.appendChild(rejectBtn);
+      wrap.appendChild(btnWrap);
+      container.appendChild(wrap);
+    }
+  });
+}
+
+// ── Helper: prepare result view for streaming ──
+function prepareResultView(label, acceptLabel = 'Accept') {
+  document.getElementById('aiResultLabel').textContent = label;
+  document.getElementById('aiResultText').textContent  = '';
+  document.getElementById('aiResultText').classList.add('streaming');
+  document.getElementById('aiStreamingBar').classList.remove('hidden');
+  document.getElementById('aiResultBtns').innerHTML = `
+    <button class="ai-mini-btn ai-mini-ghost" id="aiDiscardBtn">Discard</button>
+    <button class="ai-mini-btn" id="aiAcceptBtn">${acceptLabel}</button>
+  `;
+  document.getElementById('aiDiscardBtn').addEventListener('click', () => {
+    aiPendingAction = null; switchAIView('empty');
+  });
+  document.getElementById('aiAcceptBtn').addEventListener('click', acceptAIResult);
+  showAIWorkspace();
+  switchAIView('result');
+}
+
+function finishStreaming(resultText) {
+  document.getElementById('aiStreamingBar').classList.add('hidden');
+  if (!aiPendingAction) return;
+  aiPendingAction.result = resultText;
+
+  // Apply RTL direction to result panel based on selected language
+  document.getElementById('aiResultText').dir = isRTL(langSelect.value) ? 'rtl' : 'ltr';
+
+  // Summarize: no diff needed (it's a new document, not a rewrite)
+  if (aiPendingAction.type === 'summarize') {
+    document.getElementById('aiResultText').classList.remove('streaming');
+    return;
+  }
+
+  // Get the original text for diffing
+  const original = aiPendingAction.isSelection
+    ? getPlainText().slice(aiPendingAction.selectionStart, aiPendingAction.selectionStart + aiPendingAction.selectionLength)
+    : getPlainText();
+
+  renderDiff(original, resultText);
+}
+
+// ── Accept / Discard ──
+function acceptAIResult() {
+  if (!aiPendingAction?.result) return;
+  const { isSelection, selectionStart, selectionLength, result } = aiPendingAction;
+
+  if (aiPendingAction.type === 'summarize') {
+    navigator.clipboard.writeText(result).catch(() => {});
+    switchAIView('empty');
+    return;
+  }
+
+  // If we have a diff with chunk decisions, reconstruct the final text from them
+  // (undecided chunks default to accepting the AI suggestion)
+  let finalText = result;
+  const chunks = aiPendingAction.diffChunks;
+  if (chunks && chunks.length > 0) {
+    finalText = chunks.map(chunk => {
+      if (chunk.type === 'eq') return chunk.text;
+      const decision = aiPendingAction.chunkDecisions?.[chunk.idx];
+      if (decision === 'reject') return chunk.del || '';
+      // 'accept' or undecided → use AI's version
+      return chunk.ins || '';
+    }).join('');
+  }
+
+  if (isSelection) {
+    const text    = getPlainText();
+    const newText = text.slice(0, selectionStart) + finalText + text.slice(selectionStart + selectionLength);
+    editor.innerText = newText;
+  } else {
+    editor.innerText = finalText;
+  }
+
+  diagnostics = [];
+  renderAnnotations();
+  updateCounters(getPlainText());
+  scheduleCheck(true);
+  aiPendingAction = null;
+  switchAIView('empty');
+
+  // If split view is open, update its upper box since editor content changed
+  if (proofreadSplitActive) {
+    document.getElementById('proofreadOriginal').innerHTML = escapeHtml(getPlainText());
+  }
+}
+
+// ── Long-text guard ──
+function showLongTextWarning(wordCount, proceedFn) {
+  showAIWorkspace();
+  switchAIView('result');
+  document.getElementById('aiResultLabel').textContent = 'Long Text';
+  document.getElementById('aiResultText').textContent = `Your document has ${wordCount} words. AI results may be truncated or slow for very long texts. Consider selecting a specific section instead.`;
+  document.getElementById('aiResultText').classList.remove('streaming');
+  document.getElementById('aiStreamingBar').classList.add('hidden');
+  document.getElementById('aiResultBtns').innerHTML = `
+    <button class="ai-mini-btn ai-mini-ghost" id="aiLongCancelBtn">Cancel</button>
+    <button class="ai-mini-btn" id="aiLongContinueBtn">Continue anyway</button>
+  `;
+  document.getElementById('aiLongCancelBtn').addEventListener('click', () => switchAIView('empty'));
+  document.getElementById('aiLongContinueBtn').addEventListener('click', () => proceedFn());
+}
+
+// ── Improve (Proofread) — uses split view ──
+function triggerImprove() {
+  // If split is already active, close it first to get fresh editor state
+  if (proofreadSplitActive) {
+    closeProofreadSplit();
+  }
+
+  const selObj  = window.getSelection();
+  const selText = selObj && !selObj.isCollapsed ? selObj.toString().trim() : '';
+  const target  = selText || getPlainText();
+  if (!target.trim()) { showAIError('Please write some text first.'); return; }
+
+  const isSelection    = !!selText;
+  const selectionStart = isSelection ? getSelectionOffset() : 0;
+
+  // Long-text guard (only for full-doc, not selections)
+  if (!isSelection) {
+    const wordCount = target.trim().split(/\s+/).filter(Boolean).length;
+    if (wordCount > 1500) {
+      showLongTextWarning(wordCount, () => runImprove(target, isSelection, selectionStart));
+      return;
+    }
+  }
+
+  runImprove(target, isSelection, selectionStart);
+}
+
+function runImprove(target, isSelection, selectionStart) {
+  aiPendingAction = { type: 'improve', isSelection, selectionStart, selectionLength: target.length };
+
+  // Capture the editor's current state before opening split
+  const originalHtml = editor.innerHTML;
+  const originalPlainText = isSelection
+    ? getPlainText().slice(selectionStart, selectionStart + target.length)
+    : getPlainText();
+
+  // Open the split view instead of the right-panel workspace
+  openProofreadSplit(originalHtml, originalPlainText);
+
+  runAIAction(async (signal) => {
+    let result = '';
+    await callClaude({
+      signal,
+      systemPrompt: 'You are an expert editor. Rewrite the provided text to improve clarity, flow, grammar, and word choice. Preserve the original meaning and tone. Return ONLY the improved text — no commentary, no preamble, no quotation marks.',
+      userMessage: target,
+      onChunk: chunk => {
+        result += chunk;
+        document.getElementById('proofreadResultText').textContent = result;
+      },
+    });
+    // Streaming done — render diff in the split view
+    document.getElementById('proofreadStreamingBar').classList.add('hidden');
+    if (!aiPendingAction) return;
+    aiPendingAction.result = result;
+
+    // Apply RTL direction
+    document.getElementById('proofreadResultText').dir = isRTL(langSelect.value) ? 'rtl' : 'ltr';
+
+    // Render diff in the lower box
+    renderDiffInSplit(originalPlainText, result);
+
+    // Re-enable Proofread button
+    const proofreadBtn = document.getElementById('proofreadBtn');
+    proofreadBtn.disabled = false;
+    proofreadBtn.textContent = 'Proofread?';
+  });
+}
+
+// ── Tone ──
+const toneDescriptions = {
+  formal:        'formal and professional, avoiding contractions and colloquialisms',
+  casual:        'casual and conversational, relaxed and natural',
+  academic:      'academic, precise, with scholarly vocabulary and structured argumentation',
+  friendly:      'warm, friendly, and approachable',
+  professional:  'professional business tone, clear and direct',
+  persuasive:    'persuasive and compelling, designed to convince the reader',
+};
+
+function triggerTone(tone) {
+  const selObj  = window.getSelection();
+  const selText = selObj && !selObj.isCollapsed ? selObj.toString().trim() : '';
+  const target  = selText || getPlainText();
+  if (!target.trim()) { showAIError('Please write some text first.'); return; }
+
+  const isSelection    = !!selText;
+  const selectionStart = isSelection ? getSelectionOffset() : 0;
+
+  // Long-text guard (only for full-doc, not selections)
+  if (!isSelection) {
+    const wordCount = target.trim().split(/\s+/).filter(Boolean).length;
+    if (wordCount > 1500) {
+      showLongTextWarning(wordCount, () => runTone(tone, target, isSelection, selectionStart));
+      return;
+    }
+  }
+
+  runTone(tone, target, isSelection, selectionStart);
+}
+
+function runTone(tone, target, isSelection, selectionStart) {
+  aiPendingAction = { type: 'tone', isSelection, selectionStart, selectionLength: target.length };
+  prepareResultView(`${tone.charAt(0).toUpperCase() + tone.slice(1)} Tone`);
+  document.getElementById('aiStreamingLabel').textContent = 'Adjusting tone…';
+
+  runAIAction(async (signal) => {
+    let result = '';
+    await callClaude({
+      signal,
+      systemPrompt: `You are an expert writing assistant. Rewrite the following text with a ${toneDescriptions[tone]} tone. Keep the same information and meaning. Return ONLY the rewritten text — no commentary, no preamble.`,
+      userMessage: target,
+      onChunk: chunk => {
+        result += chunk;
+        document.getElementById('aiResultText').textContent = result;
+      },
+    });
+    finishStreaming(result);
+  });
+}
+
+// ── Summarize ──
+function triggerSummarize() {
+  const text = getPlainText();
+  const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
+  if (wordCount < 30) { showAIError('Need at least 30 words to summarize.'); return; }
+
+  aiPendingAction = { type: 'summarize' };
+  document.getElementById('aiResultLabel').textContent = 'Summary';
+  document.getElementById('aiResultText').textContent  = '';
+  document.getElementById('aiResultText').classList.add('streaming');
+  document.getElementById('aiStreamingBar').classList.remove('hidden');
+  document.getElementById('aiStreamingLabel').textContent = 'Summarizing…';
+  document.getElementById('aiResultBtns').innerHTML = `
+    <button class="ai-mini-btn ai-mini-ghost" id="aiDiscardBtn">Close</button>
+    <button class="ai-mini-btn" id="aiAcceptBtn" title="Copy to clipboard">Copy</button>
+  `;
+  document.getElementById('aiDiscardBtn').addEventListener('click', () => { aiPendingAction = null; switchAIView('empty'); });
+  document.getElementById('aiAcceptBtn').addEventListener('click', acceptAIResult);
+  showAIWorkspace();
+  switchAIView('result');
+  document.getElementById('aiStreamingLabel').textContent = 'Summarizing…';
+
+  runAIAction(async (signal) => {
+    let result = '';
+    await callClaude({
+      signal,
+      systemPrompt: 'You are a skilled summarizer. Provide a concise summary in 2-4 sentences. Capture the main points. Return ONLY the summary.',
+      userMessage: text,
+      onChunk: chunk => {
+        result += chunk;
+        document.getElementById('aiResultText').textContent = result;
+      },
+    });
+    finishStreaming(result);
+    if (aiPendingAction) aiPendingAction.result = result;
+  });
+}
+
+// ── Restructure ──
+function triggerRestructure() {
+  const selObj  = window.getSelection();
+  const selText = selObj && !selObj.isCollapsed ? selObj.toString().trim() : '';
+  if (!selText) {
+    showAIError('Select a sentence or passage first, then click Restructure.');
+    return;
+  }
+
+  const selectionStart = getSelectionOffset();
+  aiPendingAction = { type: 'restructure', isSelection: true, selectionStart, selectionLength: selText.length };
+  prepareResultView('Restructured');
+  document.getElementById('aiStreamingLabel').textContent = 'Restructuring…';
+
+  runAIAction(async (signal) => {
+    let result = '';
+    await callClaude({
+      signal,
+      systemPrompt: 'You are an expert editor. Restructure the following sentence or passage to improve its flow, clarity, and readability. Keep the same meaning. Return ONLY the restructured text — no commentary.',
+      userMessage: selText,
+      onChunk: chunk => {
+        result += chunk;
+        document.getElementById('aiResultText').textContent = result;
+      },
+    });
+    finishStreaming(result);
+  });
+}
+
+// ── Explain Error ──
+function triggerExplainError(idx) {
+  const match = diagnostics[idx];
+  if (!match) return;
+
+  const type     = getMatchType(match);
+  const fullText = getPlainText();
+  const word     = fullText.slice(match.offset, match.offset + match.length);
+  const context  = getSentenceContext(match.offset);
+
+  // Show chip
+  document.getElementById('aiExplainChip').innerHTML = `
+    <strong>"${escapeHtml(word)}"</strong>
+    ${escapeHtml(match.shortMessage || match.message)}
+  `;
+
+  document.getElementById('aiExplainText').textContent = '';
+  document.getElementById('aiExplainText').classList.add('streaming');
+  document.getElementById('aiExplainStreamingBar').classList.remove('hidden');
+
+  showAIWorkspace();
+  switchAIView('explain');
+
+  runAIAction(async (signal) => {
+    let result = '';
+    await callClaude({
+      signal,
+      systemPrompt: 'You are an expert grammar and writing teacher. A grammar checker flagged an issue. Explain clearly and pedagogically: (1) what the specific rule or convention is, (2) why this particular instance violates it, (3) how to fix it, (4) a brief example of correct usage. Be concise but complete. Use plain, accessible language.',
+      userMessage: `Flagged text: "${word}"\nIssue type: ${type}\nChecker message: "${match.message}"\nContext: "${context}"`,
+      onChunk: chunk => {
+        result += chunk;
+        document.getElementById('aiExplainText').textContent = result;
+      },
+    });
+    document.getElementById('aiExplainText').classList.remove('streaming');
+    document.getElementById('aiExplainStreamingBar').classList.add('hidden');
+  });
+}
+
+// ── Smart Suggestions ──
+aiMoreSugsBtn.addEventListener('click', async () => {
+  if (activeMatchIndex === null) return;
+  const match = diagnostics[activeMatchIndex];
+  if (!match) return;
+
+  aiMoreSugsBtn.textContent = '✦ Loading…';
+  aiMoreSugsBtn.disabled = true;
+
+  const fullText = getPlainText();
+  const word     = fullText.slice(match.offset, match.offset + match.length);
+  const context  = getSentenceContext(match.offset);
+
+  try {
+    const raw = await callClaude({
+      systemPrompt: 'You are a language expert. Given a word or phrase flagged for a grammar/style issue in context, suggest 3-5 alternative replacements that would fix the issue. Return ONLY a valid JSON array of strings with no other text. Example: ["replacement1","replacement2","replacement3"]',
+      userMessage: `Context: "${context}"\nFlagged text: "${word}"\nIssue: "${match.message}"`,
+    });
+    // Extract JSON array from response
+    const jsonMatch = raw.match(/\[[\s\S]*?\]/);
+    const suggestions = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
+    if (suggestions.length === 0) throw new Error('No suggestions');
+
+    aiMoreSugsList.innerHTML = '';
+    suggestions.forEach(sug => {
+      const btn = document.createElement('button');
+      btn.className = 'suggestion-btn';
+      btn.textContent = sug;
+      btn.addEventListener('click', () => applyFix(activeMatchIndex, sug));
+      aiMoreSugsList.appendChild(btn);
+    });
+    aiMoreSugsList.classList.remove('hidden');
+    aiMoreSugsBtn.classList.add('hidden');
+  } catch(e) {
+    aiMoreSugsBtn.textContent = '✦ More suggestions';
+    aiMoreSugsBtn.disabled = false;
+  }
+});
+
+// ── AI Chat ──
+async function sendChatMessage() {
+  const input = document.getElementById('aiChatInput');
+  const msg   = input.value.trim();
+  if (!msg || aiIsStreaming) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+
+  const messagesEl = document.getElementById('aiChatMessages');
+
+  // User bubble
+  const userBubble = document.createElement('div');
+  userBubble.className = 'ai-chat-msg user';
+  userBubble.textContent = msg;
+  userBubble.dir = isRTL(langSelect.value) ? 'rtl' : 'ltr';
+  messagesEl.appendChild(userBubble);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+
+  aiChatHistory.push({ role: 'user', content: msg });
+
+  // Assistant bubble (streaming)
+  const aiBubble = document.createElement('div');
+  aiBubble.className = 'ai-chat-msg assistant streaming';
+  messagesEl.appendChild(aiBubble);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+
+  document.getElementById('aiChatSend').disabled = true;
+
+  const docText = getPlainText();
+  const sysPrompt = `You are a helpful AI writing assistant embedded in a proofreading application called TransCraft. Help the user improve their writing — explain grammar rules, suggest improvements, discuss style, adjust tone, or answer any writing-related question.\n\nUser's current document:\n---\n${docText || '(empty)'}\n---\n\nKeep responses focused and concise.`;
+
+  aiStreamController = new AbortController();
+  aiIsStreaming = true;
+  updateApiStatus('checking');
+
+  let fullReply = '';
+
+  try {
+    await callClaudeChat({
+      systemPrompt: sysPrompt,
+      messages: aiChatHistory,
+      signal: aiStreamController.signal,
+      onChunk: chunk => {
+        fullReply += chunk;
+        aiBubble.textContent = fullReply;
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      },
+    });
+    aiBubble.classList.remove('streaming');
+    aiChatHistory.push({ role: 'assistant', content: fullReply });
+    updateApiStatus('ok');
+  } catch(err) {
+    if (err.name !== 'AbortError') {
+      aiBubble.textContent = 'Error: ' + err.message;
+      aiBubble.classList.remove('streaming');
+      updateApiStatus('error');
+    } else {
+      updateApiStatus('idle');
+    }
+  } finally {
+    aiIsStreaming = false;
+    document.getElementById('aiChatSend').disabled = false;
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  AI TOOLBAR REFRESH
+// ════════════════════════════════════════════════════════════════════════
+function refreshAIToolbar() {
+  const hasKey = !!aiApiKey;
+  aiToolbarSetup.classList.toggle('hidden', hasKey);
+  aiToolbarActions.classList.toggle('hidden', !hasKey);
+  aiKeyIcon.classList.toggle('active', hasKey);
+  // Green button when key is set
+  document.getElementById('aiKeyBtn').classList.toggle('key-saved', hasKey);
+  if (hasKey && aiApiStatus === 'none') updateApiStatus('idle');
+  else if (!hasKey) updateApiStatus('none');
+  // Refresh explain buttons visibility on existing cards
+  renderIssues(diagnostics);
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  EVENT WIRING
+// ════════════════════════════════════════════════════════════════════════
+
+// ── Editor events ──
+editor.addEventListener('input', () => {
+  updateCounters(getPlainText());
+  hidePopover();
+  scheduleCheck();
+});
+
+editor.addEventListener('keydown', e => {
+  if (e.key === 'Escape') hidePopover();
+});
+
+// ── Language change ──
+langSelect.addEventListener('change', () => {
+  applyRTL(isRTL(langSelect.value));
+  scheduleCheck(true);
+});
+
+// ── Clear ──
+clearBtn.addEventListener('click', () => {
+  if (proofreadSplitActive) closeProofreadSplit();
+  // Reset version history on clear
+  proofreadVersions = [];
+  proofreadVersionIdx = 0;
+  proofreadCount = 0;
+  editor.innerText = '';
+  diagnostics = [];
+  renderAnnotations();
+  renderIssues([]);
+  setStatus('ok', 0);
+  updateCounters('');
+  hidePopover();
+  document.getElementById('proofreadIssueCount').textContent = '';
+  editor.focus();
+});
+
+// ── Popover dismiss ──
+document.addEventListener('click', e => {
+  if (!popover.contains(e.target) && !e.target.closest('mark')) hidePopover();
+});
+
+window.addEventListener('resize', hidePopover);
+document.querySelector('.editor-scroll').addEventListener('scroll', hidePopover);
+
+// ── AI Toolbar buttons ──
+document.getElementById('aiToolbarSetupBtn').addEventListener('click', () => {
+  aiKeyInput.value = aiApiKey;
+  document.getElementById('aiKeyClearBtn').classList.toggle('hidden', !aiApiKey);
+  aiKeyModal.showModal();
+  setTimeout(() => aiKeyInput.focus(), 50);
+});
+
+document.getElementById('proofreadBtn').addEventListener('click', triggerImprove);
+document.getElementById('proofreadStopBtn').addEventListener('click', () => {
+  aiStreamController?.abort();
+});
+document.getElementById('btnSummarize').addEventListener('click', triggerSummarize);
+document.getElementById('btnRestructure').addEventListener('click', triggerRestructure);
+
+document.getElementById('btnTone').addEventListener('click', e => {
+  e.stopPropagation();
+  document.getElementById('toneMenu').classList.toggle('open');
+});
+
+document.querySelectorAll('#toneMenu [data-tone]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.getElementById('toneMenu').classList.remove('open');
+    triggerTone(btn.dataset.tone);
+  });
+});
+
+document.addEventListener('click', () => {
+  document.getElementById('toneMenu').classList.remove('open');
+});
+
+document.getElementById('btnChat').addEventListener('click', () => {
+  showAIWorkspace();
+  switchAIView('chat');
+});
+
+// ── AI workspace collapse ──
+document.getElementById('aiWorkspaceClose').addEventListener('click', () => {
+  aiPendingAction = null;
+  switchAIView('empty'); // also hides the workspace
+});
+
+// ── AI Stop buttons ──
+document.getElementById('aiStopBtn').addEventListener('click', () => { aiStreamController?.abort(); });
+document.getElementById('aiExplainStopBtn').addEventListener('click', () => { aiStreamController?.abort(); });
+
+// ── AI result default buttons (before any streaming rewires them) ──
+document.getElementById('aiDiscardBtn').addEventListener('click', () => { aiPendingAction = null; switchAIView('empty'); });
+document.getElementById('aiAcceptBtn').addEventListener('click', acceptAIResult);
+
+// ── Explain back ──
+document.getElementById('aiExplainBack').addEventListener('click', () => switchAIView('empty'));
+
+// ── Chat ──
+document.getElementById('aiChatSend').addEventListener('click', sendChatMessage);
+document.getElementById('aiChatInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage(); }
+});
+
+document.getElementById('aiChatClear').addEventListener('click', () => {
+  aiChatHistory = [];
+  const msgs = document.getElementById('aiChatMessages');
+  msgs.innerHTML = '<div class="ai-chat-msg assistant" style="opacity:0.6">History cleared. Ask me anything about your text!</div>';
+});
+
+document.getElementById('aiChatClose').addEventListener('click', () => switchAIView('empty'));
+
+// ── API Key Modal ──
+document.getElementById('aiKeyBtn').addEventListener('click', () => {
+  aiKeyInput.value = aiApiKey;
+  document.getElementById('aiKeyClearBtn').classList.toggle('hidden', !aiApiKey);
+  aiKeyModal.showModal();
+  setTimeout(() => aiKeyInput.focus(), 50);
+});
+
+document.getElementById('aiKeySave').addEventListener('click', () => {
+  const key = aiKeyInput.value.trim();
+  if (!key) return;
+  aiApiKey = key;
+  localStorage.setItem('eloquent_ai_key', key);
+  aiKeyModal.close();
+  refreshAIToolbar();
+  updateApiStatus('idle');
+  showToast('✓', 'API key saved — AI features are ready');
+});
+
+document.getElementById('aiModalCancel').addEventListener('click', () => aiKeyModal.close());
+document.getElementById('aiModalClose').addEventListener('click', () => aiKeyModal.close());
+
+document.getElementById('aiKeyClearBtn').addEventListener('click', () => {
+  aiApiKey = '';
+  localStorage.removeItem('eloquent_ai_key');
+  aiKeyModal.close();
+  refreshAIToolbar();
+  switchAIView('empty');
+  updateApiStatus('none');
+  showToast('✕', 'API key removed');
+});
+
+aiKeyModal.addEventListener('click', e => { if (e.target === aiKeyModal) aiKeyModal.close(); });
+
+// Enter key saves
+aiKeyInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('aiKeySave').click();
+});
+
+// ── Chat textarea auto-resize ──
+document.getElementById('aiChatInput').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+});
+
+// ════════════════════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════════════════════
+refreshAIToolbar();
+applyRTL(isRTL(langSelect.value)); // Apply RTL if a RTL language is pre-selected
+
+// Seed demo text
+editor.innerText = `Write or paste your text here too have it checked continuously. Errors will be underlined in different colours: we will mark seplling errors with red underilnes. Furthermore grammar error's are highlighted in yellow. LanguageTool also marks style issues in a reliable manner by underlining them in blue. Its a impressively versatile tool especially if youd like to tell a colleague from over sea's about what happened at 5 PM in the afternoon on Monday, 27 May 2007.`;
+
+updateCounters(getPlainText());
+scheduleCheck(true);
+</script>
+</body>
+</html>

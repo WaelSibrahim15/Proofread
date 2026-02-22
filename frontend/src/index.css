@@ -1,0 +1,414 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #1c1c1e;
+  --surface: #2c2c2e;
+  --surface2: #3a3a3c;
+  --border: #48484a;
+  --text: #f5f5f7;
+  --text-muted: #98989f;
+  --accent: #0a84ff;
+  --error: #ff453a;
+  --warn: #ffd60a;
+  --typo: #ff9f0a;
+  --style: #5ac8fa;
+  --success: #30d158;
+  --radius: 10px;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'Menlo', 'Consolas', monospace;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  width: 22px;
+  height: 22px;
+  color: var(--accent);
+}
+
+.app-name {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+.app-tagline {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lt-loading {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.lang-select {
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 13px;
+  font-family: var(--font);
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  padding-right: 28px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2398989f' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+
+.lang-select:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Main ── */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.main {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Editor ── */
+.editor-wrap {
+  position: relative;
+  height: 100%;
+}
+
+.overlay,
+.editor {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 24px 28px;
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow: auto;
+  tab-size: 4;
+}
+
+.overlay {
+  color: transparent;
+  background: transparent;
+  pointer-events: auto;
+  user-select: none;
+  border: none;
+  outline: none;
+  overflow: hidden;
+  z-index: 1;
+  cursor: text;
+}
+
+.editor {
+  background: transparent;
+  color: var(--text);
+  border: none;
+  outline: none;
+  resize: none;
+  caret-color: var(--text);
+  z-index: 2;
+  pointer-events: auto;
+  caret-color: var(--accent);
+  /* Make textarea transparent except caret */
+  color: transparent;
+  background: var(--bg);
+}
+
+/* The actual text colour comes from the editor container background */
+/* We use a trick: set editor color transparent, show text via overlay */
+.editor-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+  z-index: 0;
+}
+
+/* Adjust: we DO want the editor text visible */
+.editor {
+  color: var(--text);
+  background: transparent;
+  z-index: 2;
+  pointer-events: all;
+}
+
+.overlay {
+  z-index: 3;
+  pointer-events: all;
+  /* clicks will pass to marks but we still need text input to go to editor */
+}
+
+/* Make the editor on top for typing, overlay for clicking marks */
+.editor {
+  z-index: 1;
+  color: transparent;
+  caret-color: var(--text);
+  background: var(--bg);
+}
+
+.overlay {
+  z-index: 2;
+  pointer-events: none; /* let clicks fall through to editor by default */
+  color: var(--text);
+}
+
+/* When there are marks, enable pointer events on overlay */
+.overlay:has(.lt-mark) {
+  pointer-events: auto;
+}
+
+.placeholder {
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+/* ── Error marks ── */
+.lt-mark {
+  position: relative;
+  border-radius: 2px;
+  cursor: pointer;
+  color: inherit;
+}
+
+.lt-grammar {
+  background: rgba(255, 69, 58, 0.18);
+  border-bottom: 2px solid var(--error);
+  text-decoration: underline;
+  text-decoration-color: var(--error);
+  text-decoration-style: wavy;
+  text-underline-offset: 3px;
+}
+
+.lt-spell {
+  background: rgba(255, 69, 58, 0.12);
+  border-bottom: 2px solid var(--error);
+  text-decoration: underline;
+  text-decoration-color: var(--error);
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+}
+
+.lt-typo {
+  background: rgba(255, 159, 10, 0.15);
+  border-bottom: 2px solid var(--typo);
+  text-decoration: underline;
+  text-decoration-color: var(--typo);
+  text-decoration-style: wavy;
+  text-underline-offset: 3px;
+}
+
+.lt-style {
+  background: rgba(90, 200, 250, 0.12);
+  border-bottom: 2px solid var(--style);
+  text-decoration: underline;
+  text-decoration-color: var(--style);
+  text-decoration-style: dashed;
+  text-underline-offset: 3px;
+}
+
+.lt-mark:hover {
+  filter: brightness(1.3);
+}
+
+/* ── Popover ── */
+.popover {
+  position: fixed;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  z-index: 100;
+  max-width: 320px;
+  min-width: 220px;
+}
+
+.popover-message {
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 6px;
+  line-height: 1.45;
+}
+
+.popover-short {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.popover-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.suggestion-btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 13px;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.suggestion-btn:hover {
+  opacity: 0.85;
+}
+
+.dismiss-btn {
+  background: var(--surface2);
+  color: var(--text-muted);
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-family: var(--font);
+  cursor: pointer;
+}
+
+.dismiss-btn:hover {
+  color: var(--text);
+}
+
+/* ── Footer ── */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 20px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.stats {
+  display: flex;
+  gap: 16px;
+}
+
+.issue-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checking {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-muted);
+}
+
+.no-issues {
+  color: var(--success);
+}
+
+.ft-error {
+  color: var(--error);
+}
+
+.badge {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge-error {
+  background: rgba(255, 69, 58, 0.2);
+  color: var(--error);
+}
+
+.badge-warn {
+  background: rgba(255, 214, 10, 0.2);
+  color: var(--warn);
+}
+
+/* ── Spinner ── */
+.spinner-small {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(150,150,150,0.3);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
